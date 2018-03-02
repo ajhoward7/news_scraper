@@ -86,10 +86,13 @@ def get_conf(conf_name):
     return load_configs()[conf_name]
 
 if __name__ == "__main__":
-    # Putting auxillary functions together and writing output to .txt file
+    # Putting auxillary functions together and writing output to file
 
     twitter_creds_file = sys.argv[1]
-    output_filename = sys.argv[2]
+    try:
+        output_filename = sys.argv[2]
+    except:
+        output_filename = 'output.txt'
 
     api = authenticate(twitter_creds_file)
     users = get_conf("twitter_handles")
