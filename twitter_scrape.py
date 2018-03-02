@@ -1,6 +1,6 @@
 import sys
 import tweepy
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import yaml
 
 
 def loadkeys(filename):
@@ -10,7 +10,7 @@ def loadkeys(filename):
     """
     with open(filename) as f:
         items = f.readline().strip().split(', ')
-        return items
+    return items
 
 
 def authenticate(twitter_auth_filename):
@@ -27,7 +27,7 @@ def authenticate(twitter_auth_filename):
     return api
 
 
-def fetch_tweets(api, name, n):
+def fetch_tweets(api, name, n=20):
     """
     Given a tweepy API object and the screen name of the Twitter user,
     create a list of tweets where each tweet is a dictionary with the
@@ -69,41 +69,40 @@ def fetch_tweets(api, name, n):
         urls = user_tweet_i.entities['urls']
         mentions = user_tweet_i.entities['user_mentions']
 
-        analyzer = SentimentIntensityAnalyzer()
-        sentimentscore = analyzer.polarity_scores(text)['compound']
-
-        tweet = {'id':id, 'created':created, 'text':text, 'hashtags':hashtags, 'urls':urls, 'mentions':mentions, 'score':sentimentscore}
+        tweet = {'id':id, 'created':created, 'text':text, 'hashtags':hashtags, 'urls':urls, 'mentions':mentions}
 
         tweets.append(tweet)
 
     return {'user':name, 'count':n, 'tweets':tweets}
 
 
+def load_configs(path = 'conf/confs.yaml'):
+    # Load configurations.yaml file
+    CONFS = yaml.load(open(path))
+    return CONFS
 
-def fetch_following(api,name):
-    """
-    Given a tweepy API object and the screen name of the Twitter user,
-    return a a list of dictionaries containing the followed user info
-    with keys-value pairs:
+def get_conf(conf_name):
+    # Load specific configuration from configurations file
+    return load_configs()[conf_name]
 
-       name: real name
-       screen_name: Twitter screen name
-       followers: number of followers
-       created: created date (no time info)
-       image: the URL of the profile's image
+if __name__ == "__main__":
+    # Putting auxillary functions together and writing output to .txt file
 
-    To collect data: get a list of "friends IDs" then get
-    the list of users for each of those.
-    """
-    following = []
-    # num_friends = api.get_user(name).friends_count
-    for friend in tweepy.Cursor(api.friends, id=name, count = 200).items():
-        real_name = friend.name
-        screen_name = friend.screen_name
-        followers = friend.followers_count
-        created = friend.created_at.date()
-        image_url = friend.profile_image_url
-        my_dict = {'name':real_name, 'screen_name':screen_name, 'followers':followers, 'created':created, 'image':image_url}
-        following.append(my_dict)
+    twitter_creds_file = sys.argv[1]
+    output_filename = sys.argv[2]
 
-    return following
+    api = authenticate(twitter_creds_file)
+    users = get_conf("twitter_handles")
+    f = open(output_filename,'w')
+
+    try:
+        n = get_conf("n")
+    except:
+        n = 20
+        print "No 'n' specified -- using default value of 20 most recent tweets"
+
+    for user in users:
+        f.write(str(fetch_tweets(api,user,n)) + '\n\n')
+        print "Written tweets for {}".format(user)
+
+    print "Completed Analysis, output is in {}".format(output_filename)
