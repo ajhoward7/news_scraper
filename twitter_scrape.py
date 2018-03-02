@@ -1,6 +1,8 @@
 import sys
 import tweepy
 import yaml
+import json
+
 
 
 def loadkeys(filename):
@@ -63,17 +65,17 @@ def fetch_tweets(api, name, n=20):
     for i in range(n):
         user_tweet_i = user_tweets[i]
         id = user_tweet_i.id
-        created = user_tweet_i.created_at
+        #created = user_tweet_i.created_at
         text = user_tweet_i.text
         hashtags = user_tweet_i.entities['hashtags']
         urls = user_tweet_i.entities['urls']
         mentions = user_tweet_i.entities['user_mentions']
 
-        tweet = {'id':id, 'created':created, 'text':text, 'hashtags':hashtags, 'urls':urls, 'mentions':mentions}
+        tweet = {'id':id, 'text':text, 'hashtags':hashtags, 'urls':urls, 'mentions':mentions}
 
         tweets.append(tweet)
 
-    return {'user':name, 'count':n, 'tweets':tweets}
+    return tweets
 
 
 def load_configs(path = 'conf/confs.yaml'):
@@ -92,11 +94,12 @@ if __name__ == "__main__":
     try:
         output_filename = sys.argv[2]
     except:
-        output_filename = 'output.txt'
+        output_filename = 'output.json'
+
+    output_dict = {}
 
     api = authenticate(twitter_creds_file)
     users = get_conf("twitter_handles")
-    f = open(output_filename,'w')
 
     try:
         n = get_conf("n")
@@ -105,7 +108,11 @@ if __name__ == "__main__":
         print "No 'n' specified -- using default value of 20 most recent tweets"
 
     for user in users:
-        f.write(str(fetch_tweets(api,user,n)) + '\n\n')
+        output_dict[user] = fetch_tweets(api,user,n)
         print "Written tweets for {}".format(user)
+
+    f = open(output_filename, 'w')
+    json.dump(output_dict,f)
+    f.close()
 
     print "Completed Analysis, output is in {}".format(output_filename)
