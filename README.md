@@ -23,5 +23,6 @@ Note: Twitter imposes rate limits on individuals that reset every 15 minutes - s
 `! python rss_scraper.py`
 
 ## Output:
+- The output from both scripts is very similar in structure - a dictionary of the inputs (tweets / rss urls) mapped to a list of the outputs. In each case this output is itself formatted a list of dictionaries, each dictionary contains the information on one tweet/article for a particular user.
 - Output is automatically written to `output.json`, this can optionally be changed with an additional command line argument
 - `sample_output_digest.py` provides sample code for reading this `.json` file back into Python and a template for printing a human-readable format.
