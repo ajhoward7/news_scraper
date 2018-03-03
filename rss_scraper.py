@@ -22,6 +22,17 @@ def fetch_articles(url):
     articles = soup.find_all("item")
     return articles
 
+def process_article(article):
+    article_output = {}
+    article_output['title'] = fetch_tag_safe(article, "title")
+    article_output['description'] = fetch_tag_safe(article, "description")
+    article_output['link'] = fetch_tag_safe(article, "link")
+    article_output['pubDate'] = fetch_tag_safe(article, "pubDate")
+    article_output['source'] = fetch_tag_safe(article, "source")
+    # can add more tags here
+
+    return article_output
+
 
 if __name__ == "__main__":
     rss_feeds = lib.get_conf("rss_feeds", path = 'conf/confs.rss.yaml')
@@ -37,16 +48,7 @@ if __name__ == "__main__":
 
         output_articles = []
         for article in articles:
-            article_output = {}
-            article_output['title'] = fetch_tag_safe(article,"title")
-            article_output['description'] = fetch_tag_safe(article, "description")
-            article_output['link'] = fetch_tag_safe(article, "link")
-            article_output['pubDate'] = fetch_tag_safe(article, "pubDate")
-            article_output['source'] = fetch_tag_safe(article, "source")
-
-            # Can add more tags here
-
-            output_articles.append(article_output)
+            output_articles.append(process_article(article))
 
         output_dict[url] = output_articles
 
