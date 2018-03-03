@@ -8,7 +8,7 @@ Within this repo we provide two key methods for scraping current news data from 
 Note: Twitter imposes rate limits on individuals that reset every 15 minutes - specific information available [here](https://developer.twitter.com/en/docs/basics/rate-limiting).
 
 ## Setup:
-- This code is designed to be run within a Python 2 environment
+- This code is designed to be run with Python 2 from the Command Line
 - To run the Twitter API scrape you require to pass credentials as a command line argument, the twitter credentials should be stored in a CSV as described [here](https://github.com/parrt/msan692/blob/master/hw/sentiment.md) under *Discussion* section.
 - Custom configurations should be set within the appropriate `confs.yaml` file (a list of RSS URLs in `conf/confs.rss.yaml`, a list of Twitter user handles in `conf/confs.twitter.yaml` and a number `n` of most recent tweets to fetch for each user).
 
