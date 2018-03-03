@@ -1,9 +1,8 @@
 import sys
 import tweepy
-import yaml
 import json
 
-
+import lib
 
 def loadkeys(filename):
     """"
@@ -71,21 +70,11 @@ def fetch_tweets(api, name, n=20):
         urls = user_tweet_i.entities['urls']
         mentions = user_tweet_i.entities['user_mentions']
 
-        tweet = {'id':id, 'text':text, 'hashtags':hashtags, 'urls':urls, 'mentions':mentions}
+        tweet = {'text':text, 'hashtags':hashtags, 'mentions':mentions}
 
         tweets.append(tweet)
 
     return tweets
-
-
-def load_configs(path = 'conf/confs.yaml'):
-    # Load configurations.yaml file
-    CONFS = yaml.load(open(path))
-    return CONFS
-
-def get_conf(conf_name):
-    # Load specific configuration from configurations file
-    return load_configs()[conf_name]
 
 if __name__ == "__main__":
     # Putting auxillary functions together and writing output to file
@@ -99,10 +88,10 @@ if __name__ == "__main__":
     output_dict = {}
 
     api = authenticate(twitter_creds_file)
-    users = get_conf("twitter_handles")
+    users = lib.get_conf("twitter_handles", path = 'conf/confs.twitter.yaml')
 
     try:
-        n = get_conf("n")
+        n = lib.get_conf("n", path = 'conf/confs.twitter.yaml')
     except:
         n = 20
         print "No 'n' specified -- using default value of 20 most recent tweets"
